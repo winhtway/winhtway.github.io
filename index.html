@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Retro Typing Tutor 5 Online</title>
     
-    <!-- JS-DOS Standard CSS from CDN -->
-    <link rel="stylesheet" href="https://v8.js-dos.com/latest/js-dos.css">
+    <!-- GitHub Pages အတွက် အဆင်ပြေဆုံးဖြစ်မယ့် JS-DOS V6 Stylesheet -->
+    <link rel="stylesheet" href="https://js-dos.com/v6/build/js-dos.css">
     
     <style>
         * {
@@ -39,7 +39,6 @@
             color: #a0a0c0;
             font-size: 14px;
         }
-        /* Emulator Container Styling */
         .emulator-wrapper {
             background-color: #0f0f1a;
             padding: 10px;
@@ -47,11 +46,12 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             border: 2px solid #3f3f5f;
         }
-        #jsdos-container {
+        /* JS-DOS V6 Canvas Container */
+        #jsdos-canvas {
             width: 800px;
             height: 600px;
             border-radius: 4px;
-            overflow: hidden;
+            display: block;
         }
         .instructions {
             margin-top: 15px;
@@ -74,30 +74,30 @@
         <p>ဂန္ထဝင် လက်ကွက်အခြေခံ စာရိုက်လေ့ကျင့်ခန်းစနစ်</p>
     </div>
 
-    <!-- Emulator ထိုင်မယ့် နေရာ -->
+    <!-- Emulator ဖွင့်မယ့် Canvas နေရာ -->
     <div class="emulator-wrapper">
-        <div id="jsdos-container"></div>
+        <canvas id="jsdos-canvas"></canvas>
     </div>
 
     <div class="instructions">
-        💡 <span>အသုံးပြုပုံ လမ်းညွှန်:</span> ကွန်ပျူတာ Screen ပေါ်တွင် Mouse ဖြင့် <strong>တစ်ချက်နှိပ် (Click)</strong> ပေးပြီးမှ Keyboard ဖြင့် စာရိုက်လေ့ကျင့်နိုင်မည် ဖြစ်ပါသည်။ Full Screen ချင်ပါက Emulator အောက်ခြေရှိ full screen ခလုတ်ကို နှိပ်နိုင်ပါသည်။ (Desktop/Laptop ဖြင့်သာ ကစားရန် သင့်တော်ပါသည်)
+        💡 <span>အသုံးပြုပုံ လမ်းညွှန်:</span> Game Screen ပေါ်လာပါက <strong>Mouse ဖြင့် တစ်ချက်နှိပ် (Click)</strong> ပေးပြီးမှ Keyboard ကီးဘုတ်ကို အသုံးပြုနိုင်မည် ဖြစ်ပါသည်။ (Desktop/Laptop သီးသန့်ဖြစ်သည်)
     </div>
 
-    <!-- JS-DOS Core Script from CDN -->
-    <script src="https://v8.js-dos.com/latest/js-dos.js"></script>
+    <!-- JS-DOS V6 Core Scripts -->
+    <script src="https://js-dos.com/v6/build/js-dos.js"></script>
     <script>
-        // JS-DOS Layer ကို ခေါ်ယူအသုံးပြုခြင်း
-        const container = document.getElementById("jsdos-container");
-        
-        // ကွန်ပျူတာထဲက ချုပ်ထားမယ့် tt5.zip ဖိုင်ကို ညွှန်းပေးရပါမည်
-        emulators.createDos(container, {
-            dosboxConf: ""
-        }).then((dos) => {
-            // စောစောက Zip ချုပ်ထားတဲ့ ဖိုင်လမ်းကြောင်းကို ထည့်သွင်းပေးခြင်း
-            // သင့်ရဲ့ Server ပေါ်မှာ တင်ထားတဲ့ လမ်းကြောင်းအတိုင်း ပြောင်းပေးနိုင်ပါတယ်
-            dos.run("tt5.zip"); 
-        }).catch((err) => {
-            console.error("Emulator loading error: ", err);
+        // JS-DOS V6 initialization syntax
+        Dos(document.getElementById("jsdos-canvas"), {
+            wdosboxUrl: "https://js-dos.com/v6/build/wdosbox.js"
+        }).ready(function (fs, main) {
+            // သင့်ရဲ့ tt5.zip ဖိုင်ကို ဆွဲယူဖွင့်လှစ်ခြင်း
+            fs.extract("tt5.zip").then(function () {
+                // zip ထဲမှာရှိတဲ့ program စမယ့် .exe ဖိုင်ကို ညွှန်းပေးခြင်း
+                // အကယ်၍ exe ဖိုင်နာမည်က အခြားတစ်ခုခုဆိုလျှင် (ဥပမာ TYPING.EXE) ထိုနာမည်အတိုင်း ပြောင်းပေးပါ
+                main(["-c", "TT.EXE"]).then(function (ci) {
+                    console.log("Typing Tutor 5 Started!");
+                });
+            });
         });
     </script>
 
