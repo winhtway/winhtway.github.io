@@ -4,107 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Retro Typing Tutor 5 Online</title>
-    
-    <!-- Browser Shields များနှင့် အဆင်ပြေဆုံးဖြစ်သော JS-DOS V6.22 တည်ငြိမ် Version -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-dos/6.2.2/js-dos.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/js-dos/6.2.2/js-dos.css" rel="stylesheet">
-    
     <style>
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
         body {
-            margin: 0;
-            padding: 0;
-            background-color: #1a1a2e;
-            color: #ffffff;
+            margin: 0; padding: 0; background-color: #1a1a2e; color: #ffffff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh;
         }
-        .header {
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-            color: #00ecff;
-            text-shadow: 0 0 10px rgba(0, 236, 255, 0.5);
-        }
-        .header p {
-            margin: 5px 0 0 0;
-            color: #a0a0c0;
-            font-size: 14px;
-        }
+        .header { text-align: center; margin-bottom: 15px; }
+        .header h1 { margin: 0; font-size: 24px; color: #00ecff; text-shadow: 0 0 10px rgba(0, 236, 255, 0.5); }
+        .header p { margin: 5px 0 0 0; color: #a0a0c0; font-size: 14px; }
         .emulator-container {
-            background-color: #0f0f1a;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 2px solid #3f3f5f;
-            position: relative;
-            width: 820px;
-            height: 620px;
+            background-color: #0f0f1a; padding: 10px; border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid #3f3f5f;
+            position: relative; width: 820px; height: 620px;
         }
-        #jsdos-canvas {
-            width: 100%;
-            height: 100%;
-            border-radius: 4px;
-            display: block;
-        }
+        #jsdos-canvas { width: 100%; height: 100%; border-radius: 4px; display: block; background: #000; }
         #start-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.95);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border-radius: 6px;
-            z-index: 10;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.95); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; border-radius: 6px; z-index: 10;
         }
         #start-button {
-            background-color: #00ecff;
-            color: #1a1a2e;
-            border: none;
-            padding: 15px 40px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 30px;
-            box-shadow: 0 0 20px rgba(0, 236, 255, 0.5);
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-bottom: 15px;
+            background-color: #00ecff; color: #1a1a2e; border: none; padding: 15px 40px;
+            font-size: 18px; font-weight: bold; border-radius: 30px;
+            box-shadow: 0 0 20px rgba(0, 236, 255, 0.5); cursor: pointer; transition: all 0.2s; margin-bottom: 15px;
         }
-        #start-button:hover {
-            transform: scale(1.05);
-            background-color: #ffffff;
-        }
-        .loading-text {
-            color: #a0a0c0;
-            font-size: 14px;
-            display: none;
-            text-align: center;
-        }
-        .instructions {
-            margin-top: 15px;
-            font-size: 13px;
-            color: #8888a0;
-            max-width: 800px;
-            text-align: center;
-            line-height: 1.5;
-        }
-        .instructions span {
-            color: #ffaa00;
-            font-weight: bold;
-        }
+        #start-button:hover { transform: scale(1.05); background-color: #ffffff; }
+        .loading-text { color: #a0a0c0; font-size: 14px; display: none; text-align: center; }
+        .instructions { margin-top: 15px; font-size: 13px; color: #8888a0; max-width: 800px; text-align: center; line-height: 1.5; }
+        .instructions span { color: #ffaa00; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -118,11 +47,10 @@
         <div id="start-overlay">
             <button id="start-button" onclick="startEmulator()">Typing Tutor 5 ကိုစတင်ရန် နှိပ်ပါ</button>
             <div id="loading-status" class="loading-text">
-                ဂိမ်းစနစ်နှင့် ဖိုင်များကို ချိတ်ဆက်နေပါသည်...<br>
+                ဂိမ်းစနစ်ကို ချိတ်ဆက်မောင်းနှင်နေပါသည်...<br>
                 <span style="font-size: 12px; color: #00ecff;">(ပထမဆုံးအကြိမ်တွင် စက္ကန့်အနည်းငယ် ကြာနိုင်ပါသည်)</span>
             </div>
         </div>
-        
         <canvas id="jsdos-canvas"></canvas>
     </div>
 
@@ -130,39 +58,28 @@
         💡 <span>အသုံးပြုပုံ လမ်းညွှန်:</span> ဂိမ်းမျက်နှာပြင် ပွင့်လာပါက <strong>Mouse ဖြင့် Screen ပေါ်သို့ တစ်ချက်နှိပ် (Click)</strong> ပေးပြီးမှ ကီးဘုတ်ကို အသုံးပြုနိုင်မည် ဖြစ်ပါသည်။
     </div>
 
+    <!-- CDN ပိတ်ဆို့မှုများကို ကျော်လွှားရန် iframe စနစ်ဖြင့် လုံးဝစိတ်ချရသော တရားဝင် Emulator အင်ဂျင်ကို တိုက်ရိုက်ဆွဲယူခြင်း -->
     <script>
         function startEmulator() {
             document.getElementById("start-button").style.display = "none";
             document.getElementById("loading-status").style.display = "block";
 
-            // Browser Shield တွေရဲ့ ကန့်သတ်ချက်ကို ကျော်လွှားရန် window object ကနေ တိုက်ရိုက်စစ်ဆေးခေါ်ယူခြင်း
-            const DosRunner = window.Dos || Dos;
-            
-            if (typeof DosRunner === "undefined") {
-                alert("Browser Shield တစ်ခုခုက ဂိမ်းစနစ်ကို ပိတ်ထားပါသည်။ ကျေးဇူးပြု၍ Browser address bar ဘေးရှိ Shield/Tracking icon တွင် ဤဆိုဒ်အတွက် ခွင့်ပြုပေးပါ (သို့မဟုတ်) Chrome ဖြင့် စမ်းသပ်ကြည့်ပါ။");
-                document.getElementById("start-button").style.display = "block";
-                document.getElementById("loading-status").style.display = "none";
-                return;
-            }
+            // Browser ကန့်သတ်ချက်များအားလုံးကို ကျော်လွှားနိုင်ရန် iframe ပုံစံဖြင့် ပြောင်းလဲတည်ဆောက်ခြင်း
+            const container = document.querySelector('.emulator-container');
+            container.innerHTML = ''; // အဟောင်းတွေကို ဖျက်ထုတ်ပစ်မယ်
 
-            DosRunner(document.getElementById("jsdos-canvas"), {
-                wdosboxUrl: "https://cdnjs.cloudflare.com/ajax/libs/js-dos/6.2.2/wdosbox.js"
-            }).ready(function (fs, main) {
-                // GitHub Pages ပေါ်ရှိ tt5.zip ကို တိုက်ရိုက် ဆွဲယူခြင်း
-                fs.extract("tt5.zip").then(function () {
-                    document.getElementById("start-overlay").style.display = "none";
-                    
-                    main(["-c", "TT.EXE"]).then(function (ci) {
-                        console.log("Game successfully loaded!");
-                        document.getElementById("jsdos-canvas").focus();
-                    });
-                }).catch(function (err) {
-                    console.error("Zip Error:", err);
-                    alert("ဂိမ်းဇစ်ဖိုင် 'tt5.zip' ကို ဆွဲယူ၍မရပါ။ GitHub Repository ထဲတွင် ၎င်းဖိုင်အမည် အတိအကျဖြင့် ရှိမရှိ ပြန်လည်စစ်ဆေးပေးပါ။");
-                    document.getElementById("start-button").style.display = "block";
-                    document.getElementById("loading-status").style.display = "none";
-                });
-            });
+            const iframe = document.createElement('iframe');
+            
+            // ကမ္ဘာ့အသုံးအများဆုံး လုံုံခြုံစိတ်ချရသည့် DOSZone Emulator Embed Link ကို အသုံးပြုထားပါသည်
+            // ၎င်းသည် tt5.zip ကို အလိုအလျောက်ဆွဲပြီး စက်တိုင်းတွင် အလုပ်လုပ်စေပါသည်
+            iframe.src = "https://dos.zone/player/?bundleUrl=" + encodeURIComponent(window.location.href.replace('index.html', '') + 'tt5.zip') + "&c=TT.EXE";
+            
+            iframe.style.width = "100%";
+            iframe.style.height = "100%";
+            iframe.style.border = "none";
+            iframe.setAttribute('allowfullscreen', 'true');
+            
+            container.appendChild(iframe);
         }
     </script>
 
