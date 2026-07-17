@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Retro Typing Tutor 5 Online</title>
     
-    <!-- ပိုမိုတည်ငြိမ်ပြီး အလုပ်လုပ်သေချာသည့် JS-DOS V7 Library ကို ပြောင်းသုံးထားပါသည် -->
+    <!-- JS-DOS V7 တည်ငြိမ်ပြီးသား ဖွင့်ရလွယ်ကူသည့် Library အသစ် -->
     <script src="https://v7.js-dos.com/javascript/js-dos.js"></script>
     <link href="https://v7.js-dos.com/javascript/js-dos.css" rel="stylesheet">
     
@@ -24,7 +24,6 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            overflow: hidden;
         }
         .header {
             text-align: center;
@@ -51,7 +50,6 @@
             width: 820px;
             height: 620px;
         }
-        /* JS-DOS Container Styling */
         #jsdos {
             width: 100%;
             height: 100%;
@@ -114,42 +112,41 @@
         <p>ဂန္ထဝင် လက်ကွက်အခြေခံ စာရိုက်လေ့ကျင့်ခန်းစနစ်</p>
     </div>
 
-    <!-- Emulator Container -->
     <div class="emulator-container">
         <!-- Start Button Overlay -->
         <div id="start-overlay">
             <button id="start-button" onclick="startEmulator()">Typing Tutor 5 ကိုစတင်ရန် နှိပ်ပါ</button>
-            <div id="loading-status" class="loading-text">DOSBox စနစ်နှင့် ဂိမ်းဖိုင်များကို ပြင်ဆင်နေပါသည်... (ခေတ္တစောင့်ပါ)</div>
+            <div id="loading-status" class="loading-text">DOSBox စနစ်နှင့် ဂိမ်းဖိုင်များကို ပို့ဆောင်နေပါသည်... (ခေတ္တစောင့်ပါ)</div>
         </div>
         
-        <!-- JS-DOS V7 Container (Canvas အစား div ပြောင်းသုံးရပါသည်) -->
+        <!-- JS-DOS Container -->
         <div id="jsdos"></div>
     </div>
 
     <div class="instructions">
-        💡 <span>အသုံးပြုပုံ လမ်းညွှန်:</span> 'စတင်ရန် နှိပ်ပါ' ခလုတ်ကို နှိပ်ပြီးနောက် မည်းနေပါက ဖိုင်ဆွဲနေခြင်းဖြစ်၍ ခေတ္တစောင့်ပါ။ စာရိုက်သည့်အခါ Game Screen ပေါ်တွင် <strong>Mouse ဖြင့် တစ်ချက်နှိပ် (Click)</strong> ပေးပြီးမှ ကီးဘုတ်ရိုက်၍ ရပါမည်။
+        💡 <span>အသုံးပြုပုံ လမ်းညွှန်:</span> 'စတင်ရန် နှိပ်ပါ' ခလုတ်ကို နှိပ်ပြီးနောက် loading ပြီးပါက မျက်နှာပြင် ပွင့်လာပါမည်။ စာရိုက်သည့်အခါ Game Screen ပေါ်တွင် <strong>Mouse ဖြင့် တစ်ချက်နှိပ် (Click)</strong> ပေးပြီးမှ ကီးဘုတ်ရိုက်၍ ရပါမည်။
     </div>
 
     <script>
         function startEmulator() {
-            // UI ပြောင်းလဲခြင်း
+            // UI Update: စာသားပြောင်းလဲခြင်း
             document.getElementById("start-button").style.display = "none";
             document.getElementById("loading-status").style.display = "block";
 
-            // JS-DOS V7 သတ်မှတ်ချက်အရ ဇစ်ဖိုင်ကို တိုက်ရိုက်ဆွဲပြီး ၎င်းထဲက TT.EXE ကို မောင်းခိုင်းခြင်း
-            Dos(document.getElementById("jsdos"), {
-                wdosboxUrl: "https://v7.js-dos.com/javascript/wdosbox.js",
-                kiosk: true // Full UI မဟုတ်ဘဲ ဂိမ်းသက်သက်ပဲ သပ်သပ်ရပ်ရပ် ပြပေးမည့် စနစ်
-            }).run("tt5.zip", "TT.EXE").then((ci) => {
-                console.log("Typing Tutor 5 Started successfully via JS-DOS v7!");
-                // ဖွင့်ရတာ အောင်မြင်သွားရင် မျက်နှာပြင်ဖုံးထားတာကို ဖယ်လိုက်မယ်
-                document.getElementById("start-overlay").style.style.display = "none";
-            }).catch((err) => {
-                console.error("Error launching emulator:", err);
-                alert("ဂိမ်းကို ဖွင့်ရက် မအောင်မြင်ပါ။ 'tt5.zip' ဖိုင် မရှိခြင်း သို့မဟုတ် Server ပေါ်တွင် မရှိခြင်းကြောင့် ဖြစ်နိုင်ပါသည်။");
-                document.getElementById("start-button").style.display = "block";
-                document.getElementById("loading-status").style.display = "none";
-            });
+            // JS-DOS V7 ကို မောင်းနှင်ခြင်း
+            Dos(document.getElementById("jsdos"))
+                .run("tt5.zip", "TT.EXE")
+                .then((ci) => {
+                    console.log("Typing Tutor 5 Started!");
+                    // ကန့်လန့်ကာ Overlay ကို ဖျောက်လိုက်ခြင်း (စာလုံးပေါင်း မှန်ကန်စွာ ပြင်ဆင်ပြီး)
+                    document.getElementById("start-overlay").style.display = "none";
+                })
+                .catch((err) => {
+                    console.error("Error:", err);
+                    alert("ဂိမ်းကို ပွင့်အောင် မလုပ်နိုင်ပါ။ 'tt5.zip' ဖိုင် မရှိခြင်း သို့မဟုတ် server ပေါ်သို့ မရောက်သေးခြင်းကြောင့် ဖြစ်နိုင်ပါသည်။");
+                    document.getElementById("start-button").style.display = "block";
+                    document.getElementById("loading-status").style.display = "none";
+                });
         }
     </script>
 
