@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Retro Typing Tutor 5 Online</title>
     
-    <!-- ကမ္ဘာ့အကြီးဆုံးနှင့် အတည်ငြိမ်ဆုံး CDNJS မှ JS-DOS Library ကို ပြောင်းခေါ်ထားပါသည် -->
+    <!-- Browser Shields များနှင့် အဆင်ပြေဆုံးဖြစ်သော JS-DOS V6.22 တည်ငြိမ် Version -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-dos/6.2.2/js-dos.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/js-dos/6.2.2/js-dos.css" rel="stylesheet">
     
@@ -50,14 +50,12 @@
             width: 820px;
             height: 620px;
         }
-        /* JS-DOS Container (Canvas စနစ်ဖြင့် ပြန်ပြောင်းထားပါသည်) */
         #jsdos-canvas {
             width: 100%;
             height: 100%;
             border-radius: 4px;
             display: block;
         }
-        /* Start Button Overlay */
         #start-overlay {
             position: absolute;
             top: 0;
@@ -117,16 +115,14 @@
     </div>
 
     <div class="emulator-container">
-        <!-- Overlay -->
         <div id="start-overlay">
             <button id="start-button" onclick="startEmulator()">Typing Tutor 5 ကိုစတင်ရန် နှိပ်ပါ</button>
             <div id="loading-status" class="loading-text">
-                ဂိမ်းစနစ်နှင့် ဖိုင်များကို ပြင်ဆင်နေပါသည်...<br>
+                ဂိမ်းစနစ်နှင့် ဖိုင်များကို ချိတ်ဆက်နေပါသည်...<br>
                 <span style="font-size: 12px; color: #00ecff;">(ပထမဆုံးအကြိမ်တွင် စက္ကန့်အနည်းငယ် ကြာနိုင်ပါသည်)</span>
             </div>
         </div>
         
-        <!-- Canvas Element -->
         <canvas id="jsdos-canvas"></canvas>
     </div>
 
@@ -136,34 +132,36 @@
 
     <script>
         function startEmulator() {
-            // UI ပြောင်းလဲခြင်း
             document.getElementById("start-button").style.display = "none";
             document.getElementById("loading-status").style.display = "block";
 
-            // ပိုမိုသေချာသော Cloudflare CDN ရှိ wdosbox အင်ဂျင်ကို ညွှန်းဆိုခြင်း
-            Dos(document.getElementById("jsdos-canvas"), {
+            // Browser Shield တွေရဲ့ ကန့်သတ်ချက်ကို ကျော်လွှားရန် window object ကနေ တိုက်ရိုက်စစ်ဆေးခေါ်ယူခြင်း
+            const DosRunner = window.Dos || Dos;
+            
+            if (typeof DosRunner === "undefined") {
+                alert("Browser Shield တစ်ခုခုက ဂိမ်းစနစ်ကို ပိတ်ထားပါသည်။ ကျေးဇူးပြု၍ Browser address bar ဘေးရှိ Shield/Tracking icon တွင် ဤဆိုဒ်အတွက် ခွင့်ပြုပေးပါ (သို့မဟုတ်) Chrome ဖြင့် စမ်းသပ်ကြည့်ပါ။");
+                document.getElementById("start-button").style.display = "block";
+                document.getElementById("loading-status").style.display = "none";
+                return;
+            }
+
+            DosRunner(document.getElementById("jsdos-canvas"), {
                 wdosboxUrl: "https://cdnjs.cloudflare.com/ajax/libs/js-dos/6.2.2/wdosbox.js"
             }).ready(function (fs, main) {
-                
-                // tt5.zip ကို ဆွဲယူပြီး ဖြည်ခြင်း
+                // GitHub Pages ပေါ်ရှိ tt5.zip ကို တိုက်ရိုက် ဆွဲယူခြင်း
                 fs.extract("tt5.zip").then(function () {
-                    
-                    // အောင်မြင်ပါက ကန့်လန့်ကာ Overlay ကို ဖျောက်ခြင်း
                     document.getElementById("start-overlay").style.display = "none";
                     
-                    // TT.EXE ကို မောင်းနှင်ခြင်း
                     main(["-c", "TT.EXE"]).then(function (ci) {
-                        console.log("Typing Tutor 5 Successfully Started!");
+                        console.log("Game successfully loaded!");
                         document.getElementById("jsdos-canvas").focus();
                     });
-                    
                 }).catch(function (err) {
-                    console.error("Zip extract error: ", err);
-                    alert("tt5.zip ဖိုင်ကို မတွေ့ပါ သို့မဟုတ် ဖိုင်တည်ဆောက်ပုံ မှားယွင်းနေပါသည်။ GitHub ပေါ်တွင် ၎င်းဖိုင် ရှိမရှိ ပြန်စစ်ပေးပါ။");
+                    console.error("Zip Error:", err);
+                    alert("ဂိမ်းဇစ်ဖိုင် 'tt5.zip' ကို ဆွဲယူ၍မရပါ။ GitHub Repository ထဲတွင် ၎င်းဖိုင်အမည် အတိအကျဖြင့် ရှိမရှိ ပြန်လည်စစ်ဆေးပေးပါ။");
                     document.getElementById("start-button").style.display = "block";
                     document.getElementById("loading-status").style.display = "none";
                 });
-                
             });
         }
     </script>
