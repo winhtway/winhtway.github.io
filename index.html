@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Retro Typing Tutor 5 Online</title>
     
-    <!-- GitHub Pages အတွက် အဆင်ပြေဆုံးဖြစ်မယ့် JS-DOS V6 Stylesheet -->
-    <link rel="stylesheet" href="https://js-dos.com/v6/build/js-dos.css">
+    <!-- ပိုမိုတည်ငြိမ်ပြီး အလုပ်လုပ်သေချာသည့် JS-DOS V7 Library ကို ပြောင်းသုံးထားပါသည် -->
+    <script src="https://v7.js-dos.com/javascript/js-dos.js"></script>
+    <link href="https://v7.js-dos.com/javascript/js-dos.css" rel="stylesheet">
     
     <style>
         * {
@@ -23,7 +24,7 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            overflow-x: hidden;
+            overflow: hidden;
         }
         .header {
             text-align: center;
@@ -50,12 +51,10 @@
             width: 820px;
             height: 620px;
         }
-        /* JS-DOS V6 Canvas Container */
-        #jsdos-canvas {
+        /* JS-DOS Container Styling */
+        #jsdos {
             width: 100%;
             height: 100%;
-            border-radius: 4px;
-            display: block;
         }
         /* Start Button Overlay */
         #start-overlay {
@@ -64,7 +63,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
+            background-color: rgba(0, 0, 0, 0.95);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -120,47 +119,36 @@
         <!-- Start Button Overlay -->
         <div id="start-overlay">
             <button id="start-button" onclick="startEmulator()">Typing Tutor 5 ကိုစတင်ရန် နှိပ်ပါ</button>
-            <div id="loading-status" class="loading-text">ဂိမ်းဖိုင်များကို ရယူနေပါသည်... ခေတ္တစောင့်ဆိုင်းပေးပါ...</div>
+            <div id="loading-status" class="loading-text">DOSBox စနစ်နှင့် ဂိမ်းဖိုင်များကို ပြင်ဆင်နေပါသည်... (ခေတ္တစောင့်ပါ)</div>
         </div>
-        <!-- Emulator Canvas -->
-        <canvas id="jsdos-canvas"></canvas>
+        
+        <!-- JS-DOS V7 Container (Canvas အစား div ပြောင်းသုံးရပါသည်) -->
+        <div id="jsdos"></div>
     </div>
 
     <div class="instructions">
-        💡 <span>အသုံးပြုပုံ လမ်းညွှန်:</span> 'စတင်ရန် နှိပ်ပါ' ခလုတ်ကို နှိပ်ပြီးနောက် Game Screen ပေါ်လာပါက <strong>Emulator Screen ပေါ်တွင် Mouse ဖြင့် တစ်ချက်နှိပ် (Click)</strong> ပေးပြီးမှ Keyboard ကို အသုံးပြုနိုင်မည် ဖြစ်ပါသည်။ (Desktop/Laptop သီးသန့်ဖြစ်သည်)
+        💡 <span>အသုံးပြုပုံ လမ်းညွှန်:</span> 'စတင်ရန် နှိပ်ပါ' ခလုတ်ကို နှိပ်ပြီးနောက် မည်းနေပါက ဖိုင်ဆွဲနေခြင်းဖြစ်၍ ခေတ္တစောင့်ပါ။ စာရိုက်သည့်အခါ Game Screen ပေါ်တွင် <strong>Mouse ဖြင့် တစ်ချက်နှိပ် (Click)</strong> ပေးပြီးမှ ကီးဘုတ်ရိုက်၍ ရပါမည်။
     </div>
 
-    <!-- JS-DOS V6 Core Scripts -->
-    <script src="https://js-dos.com/v6/build/js-dos.js"></script>
     <script>
         function startEmulator() {
-            // ခလုတ်ကို ဝှက်ပြီး Loading စာသားပြရန်
+            // UI ပြောင်းလဲခြင်း
             document.getElementById("start-button").style.display = "none";
             document.getElementById("loading-status").style.display = "block";
 
-            // JS-DOS V6 Setup
-            Dos(document.getElementById("jsdos-canvas"), {
-                wdosboxUrl: "https://js-dos.com/v6/build/wdosbox.js"
-            }).ready(function (fs, main) {
-                // Zip ဖိုင်ဆွဲယူခြင်း
-                fs.extract("tt5.zip").then(function () {
-                    // Overlay တစ်ခုလုံးကို ဖျောက်လိုက်ခြင်း
-                    document.getElementById("start-overlay").style.display = "none";
-                    
-                    // EXE မောင်းနှင်ခြင်း
-                    main(["-c", "TT.EXE"]).then(function (ci) {
-                        console.log("Typing Tutor 5 Started successfully.");
-                        
-                        // အလိုအလျောက် Focus ရရှိစေရန် ရည်ရွယ်ချက်ရှိရှိ Canvas ကို Focus ပေးခြင်း
-                        document.getElementById("jsdos-canvas").focus();
-                    });
-                }).catch(function (err) {
-                    console.error("Error extracting zip: ", err);
-                    alert("Typing Tutor ဖိုင်များကို Load လုပ်ရာတွင် အမှားအယွင်းရှိပါသည်။ ရည်ညွှန်းထားသော 'tt5.zip' ဖိုင်ရှိမရှိ သို့မဟုတ် စာလုံးအကြီးအသေး မှန်ကန်မှုရှိမရှိ ပြန်လည်စစ်ဆေးပေးပါ။");
-                    // အမှားဖြစ်ခဲ့လျှင် ခလုတ်ပြန်ပြရန်
-                    document.getElementById("start-button").style.display = "block";
-                    document.getElementById("loading-status").style.display = "none";
-                });
+            // JS-DOS V7 သတ်မှတ်ချက်အရ ဇစ်ဖိုင်ကို တိုက်ရိုက်ဆွဲပြီး ၎င်းထဲက TT.EXE ကို မောင်းခိုင်းခြင်း
+            Dos(document.getElementById("jsdos"), {
+                wdosboxUrl: "https://v7.js-dos.com/javascript/wdosbox.js",
+                kiosk: true // Full UI မဟုတ်ဘဲ ဂိမ်းသက်သက်ပဲ သပ်သပ်ရပ်ရပ် ပြပေးမည့် စနစ်
+            }).run("tt5.zip", "TT.EXE").then((ci) => {
+                console.log("Typing Tutor 5 Started successfully via JS-DOS v7!");
+                // ဖွင့်ရတာ အောင်မြင်သွားရင် မျက်နှာပြင်ဖုံးထားတာကို ဖယ်လိုက်မယ်
+                document.getElementById("start-overlay").style.style.display = "none";
+            }).catch((err) => {
+                console.error("Error launching emulator:", err);
+                alert("ဂိမ်းကို ဖွင့်ရက် မအောင်မြင်ပါ။ 'tt5.zip' ဖိုင် မရှိခြင်း သို့မဟုတ် Server ပေါ်တွင် မရှိခြင်းကြောင့် ဖြစ်နိုင်ပါသည်။");
+                document.getElementById("start-button").style.display = "block";
+                document.getElementById("loading-status").style.display = "none";
             });
         }
     </script>
