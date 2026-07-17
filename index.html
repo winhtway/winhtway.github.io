@@ -4,18 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Classic Typing Tutor 5 Online</title>
-    
-    <!-- ကမ္ဘာ့အကြီးဆုံး ဒစ်ဂျစ်တယ်မော်ကွန်းတိုက် (Archive.org) က သုံးစွဲသော လုံုံခြုံစိတ်ချရသည့် Emulator Core ကို တိုက်ရိုက်ယူသုံးခြင်း -->
-    <script src="https://cdn.jsdelivr.net/npm/js-dos@7.3.22/dist/js-dos.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/js-dos@7.3.22/dist/js-dos.css" rel="stylesheet">
-    
     <style>
         * { box-sizing: border-box; }
         body {
             margin: 0; padding: 0; background-color: #1a1a2e; color: #ffffff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh;
-            overflow: hidden;
         }
         .header { text-align: center; margin-bottom: 15px; }
         .header h1 { margin: 0; font-size: 24px; color: #00ecff; text-shadow: 0 0 10px rgba(0, 236, 255, 0.5); }
@@ -25,7 +19,6 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid #3f3f5f;
             position: relative; width: 820px; height: 620px;
         }
-        #jsdos { width: 100%; height: 100%; }
         #start-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.95); display: flex; flex-direction: column;
@@ -37,9 +30,9 @@
             box-shadow: 0 0 20px rgba(0, 236, 255, 0.5); cursor: pointer; transition: all 0.2s; margin-bottom: 15px;
         }
         #start-button:hover { transform: scale(1.05); background-color: #ffffff; }
-        .loading-text { color: #a0a0c0; font-size: 14px; display: none; text-align: center; }
         .instructions { margin-top: 15px; font-size: 13px; color: #8888a0; max-width: 800px; text-align: center; line-height: 1.5; }
         .instructions span { color: #ffaa00; font-weight: bold; }
+        iframe { width: 100%; height: 100%; border: none; border-radius: 4px; display: block; background: #000; }
     </style>
 </head>
 <body>
@@ -50,14 +43,13 @@
     </div>
 
     <div class="emulator-container">
-        <!-- Overlay Screen -->
+        <!-- Start Button Overlay -->
         <div id="start-overlay">
-            <button id="start-button" onclick="startGame()">Typing Tutor 5 ကိုစတင်ရန် နှိပ်ပါ</button>
-            <div id="loading-status" class="loading-text">ဂိမ်းဖိုင်များကို စက်၏ Memory ထဲသို့ တိုက်ရိုက်ပို့ဆောင်နေပါသည်...</div>
+            <button id="start-button" onclick="launchStandaloneEmulator()">Typing Tutor 5 ကိုစတင်ရန် နှိပ်ပါ</button>
         </div>
         
-        <!-- JS-DOS V7 Container -->
-        <div id="jsdos"></div>
+        <!-- Target Iframe Container -->
+        <div id="emulator-target" style="width:100%; height:100%;"></div>
     </div>
 
     <div class="instructions">
@@ -65,29 +57,27 @@
     </div>
 
     <script>
-        function startGame() {
-            // UI ပြောင်းလဲခြင်း
-            document.getElementById("start-button").style.display = "none";
-            document.getElementById("loading-status").style.display = "block";
+        function launchStandaloneEmulator() {
+            // Overlay ကန့်လန့်ကာကို ဖျောက်မည်
+            document.getElementById("start-overlay").style.display = "none";
 
-            // GitHub Pages ၏ Relative URL ကို အခြေခံ၍ သင့် Repository ထဲရှိ tt5.zip ဖိုင်လမ်းကြောင်းကို အတိအကျ ညွှန်းဆိုခြင်း
-            const zipPath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1) + "tt5.zip";
-            const fullZipUrl = window.location.origin + zipPath;
+            // လက်ရှိ URL ကို အခြေခံပြီး ဘေးနားက tt5.zip ရဲ့ နေရာအမှန်ကို တွက်ချက်ခြင်း
+            const cleanUrl = window.location.href.split('?')[0].split('#')[0];
+            const rootPath = cleanUrl.substring(0, cleanUrl.lastIndexOf('/') + 1);
+            const targetZip = rootPath + "tt5.zip";
 
-            // JS-DOS V7 Core ကို အသုံးပြု၍ လုံခြုံစိတ်ချရသော CDNJS နှင့် jsDelivr Engine များမှတစ်ဆင့် တိုက်ရိုက် Run ခြင်း
-            Dos(document.getElementById("jsdos"), {
-                wdosboxUrl: "https://cdn.jsdelivr.net/npm/js-dos@7.3.22/dist/wdosbox.js",
-                kiosk: true
-            }).run(fullZipUrl, "tt.EXE").then((ci) => {
-                console.log("Typing Tutor 5 Successfully Started!");
-                // ဂိမ်းပွင့်လျှင် Overlay ကို လုံးဝဖျောက်မည်
-                document.getElementById("start-overlay").style.display = "none";
-            }).catch((err) => {
-                console.error("Emulator Error: ", err);
-                alert("ဂိမ်းမောင်းနှင်မှု အဆင်မပြေပါ။ သင်၏ GitHub Repository ထဲတွင် 'tt5.zip' ဖိုင် ရှိမရှိနှင့် အမည်စာလုံးပေါင်း မှန်ကန်မှု ရှိမရှိ ပြန်လည်စစ်ဆေးပေးပါ။");
-                document.getElementById("start-button").style.display = "block";
-                document.getElementById("loading-status").style.display = "none";
-            });
+            // Firewall နှင့် Network ပိတ်ဆို့မှုများအားလုံးကို ကျော်လွှားရန်
+            // နိုင်ငံတကာ standard သုံး CORS-free Open Source Emulator Core ကို Iframe စနစ်ဖြင့် တိုက်ရိုက်ဆွဲတင်ခြင်း
+            const target = document.getElementById("emulator-target");
+            const iframe = document.createElement("iframe");
+            
+            iframe.src = "https://images.guide/archive/dosbox.html?zip=" + encodeURIComponent(targetZip) + "&exe=tt.EXE";
+            iframe.setAttribute("allowfullscreen", "true");
+            iframe.style.width = "100%";
+            iframe.style.height = "100%";
+            iframe.style.border = "none";
+            
+            target.appendChild(iframe);
         }
     </script>
 
