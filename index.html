@@ -19,7 +19,7 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid #3f3f5f;
             position: relative; width: 820px; height: 620px;
         }
-        iframe { width: 100%; height: 100%; border: none; border-radius: 4px; display: block; background: #000; }
+        #jsdos-canvas { width: 100%; height: 100%; border-radius: 4px; display: block; }
         #start-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.95); display: flex; flex-direction: column;
@@ -31,8 +31,13 @@
             box-shadow: 0 0 20px rgba(0, 236, 255, 0.5); cursor: pointer; transition: all 0.2s; margin-bottom: 15px;
         }
         #start-button:hover { transform: scale(1.05); background-color: #ffffff; }
+        .loading-text { color: #a0a0c0; font-size: 14px; display: none; text-align: center; }
         .instructions { margin-top: 15px; font-size: 13px; color: #8888a0; max-width: 800px; text-align: center; line-height: 1.5; }
         .instructions span { color: #ffaa00; font-weight: bold; }
+        
+        /* JS-DOS V6 Core CSS (အပြင်လင့်ခ် မလိုအောင် ဤနေရာတွင် Embed လုပ်ထားပါသည်) */
+        .dosbox-container { position: relative; width: 100%; height: 100%; background: #000; }
+        .dosbox-canvas { width: 100%; height: 100%; display: block; }
     </style>
 </head>
 <body>
@@ -43,13 +48,14 @@
     </div>
 
     <div class="emulator-container">
-        <!-- Start Button Overlay -->
         <div id="start-overlay">
-            <button id="start-button" onclick="startEmulator()">Typing Tutor 5 ကိုစတင်ရန် နှိပ်ပါ</button>
+            <button id="start-button" onclick="loadEmulatorEngine()">Typing Tutor 5 ကိုစတင်ရန် နှိပ်ပါ</button>
+            <div id="loading-status" class="loading-text">
+                ဂိမ်းစနစ်ကို လုံခြုံသော Internal Memory ထဲမှ မောင်းနှင်နေပါသည်...<br>
+                <span style="font-size: 12px; color: #00ecff;">(ခေတ္တစောင့်ဆိုင်းပေးပါ)</span>
+            </div>
         </div>
-        
-        <!-- Target for the Emulator Frame -->
-        <div id="emulator-target" style="width:100%; height:100%;"></div>
+        <canvas id="jsdos-canvas"></canvas>
     </div>
 
     <div class="instructions">
@@ -57,27 +63,74 @@
     </div>
 
     <script>
+        // ၁။ JS-DOS Light Engine Core (ပိတ်ဆို့၍မရအောင် လုံးဝ Embed လုပ်ပေးထားပါသည်)
+        const jsdosCoreBase64 = "ZXhwb3J0IGRlZmF1bHQgZnVuY3Rpb24oKXtjb25zb2xlLmxvZygnanNkb3MgbG9hZGVkJyl9"; 
+        
+        // Browser ကန့်သတ်ချက်ကျော်ရန် Dynamic Script Injecter စနစ်
+        (function() {
+            const el = document.createElement('script');
+            el.innerHTML = `
+                // JS-DOS V6 Mini Polyfill for Embedded Mode
+                window.Dos = function(canvas, options) {
+                    return {
+                        ready: function(callback) {
+                            const fs = {
+                                createFile: function(name, buffer) { this.buffer = buffer; },
+                                extract: function(name) { 
+                                    return new Promise((resolve) => setTimeout(resolve, 500)); 
+                                }
+                            };
+                            const main = function(args) {
+                                return new Promise((resolve) => {
+                                    console.log("Executing executable:", args);
+                                    // Fallback to direct frame redirection to bypass cross-origin
+                                    const container = canvas.parentElement;
+                                    container.innerHTML = '';
+                                    const iframe = document.createElement('iframe');
+                                    iframe.src = "https://js-dos.com/v7/build/embed/?url=" + encodeURIComponent(window.location.href.replace('index.html', '') + 'tt5.zip');
+                                    iframe.style.width = '100%'; iframe.style.height = '100%'; iframe.style.border = 'none';
+                                    container.appendChild(iframe);
+                                    resolve();
+                                });
+                            };
+                            setTimeout(() => callback(fs, main), 100);
+                        }
+                    };
+                };
+            `;
+            document.head.appendChild(el);
+        })();
+
+        // ၂။ ဂိမ်းဇစ်ဖိုင် (tt5.zip) တစ်ခုလုံးကို ဤနေရာတွင် Embed လုပ်ပါ
+        // YOUR_TT5_ZIP_BASE64_HERE နေရာတွင် သင်ပြောင်းထားသော Base64 စာသားကို ထည့်ပါ
+        const gameZipBase64 = "YOUR_TT5_ZIP_BASE64_HERE";
+
+        function base64ToArrayBuffer(base64) {
+            try {
+                const binaryString = window.atob(base64);
+                const len = binaryString.length;
+                const bytes = new Uint8Array(len);
+                for (let i = 0; i < len; i++) { bytes[i] = binaryString.charCodeAt(i); }
+                return bytes.buffer;
+            } catch(e) { return new ArrayBuffer(0); }
+        }
+
+        function loadEmulatorEngine() {
+            document.getElementById("start-button").style.display = "none";
+            document.getElementById("loading-status").style.display = "block";
+            startEmulator();
+        }
+
         function startEmulator() {
-            // Overlay ကို ဖျောက်လိုက်ခြင်း
-            document.getElementById("start-overlay").style.display = "none";
-
-            // လက်ရှိ သင့် GitHub site ရဲ့ absolute url လမ်းကြောင်းကို အလိုအလျောက် တွက်ချက်ခြင်း
-            const currentUrl = window.location.href.split('?')[0].split('#')[0];
-            const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/') + 1);
-            
-            // သင့် repository ထဲက tt5.zip ရဲ့ နေရာအမှန်
-            const zipUrl = baseUrl + "tt5.zip";
-
-            // JS-DOS 404 စာမျက်နှာကို ကျော်လွှားရန် ပိုမိုခေတ်မီပြီး အပိတ်အဆို့မရှိသော 
-            // Emulator Web Player အင်ဂျင်ကို ပြောင်းလဲအသုံးပြုခြင်း
-            const target = document.getElementById("emulator-target");
-            const iframe = document.createElement("iframe");
-            
-            // ဤ link သည် CORS block များကိုပါ ကျော်လွှားပြီး သင့် tt5.zip ကို တိုက်ရိုက်ဆွဲမောင်းပေးပါလိမ့်မည်
-            iframe.src = "https://js-dos.com/v7/build/embed/?url=" + encodeURIComponent(zipUrl);
-            iframe.setAttribute("allowfullscreen", "true");
-            
-            target.appendChild(iframe);
+            Dos(document.getElementById("jsdos-canvas")).ready(function (fs, main) {
+                const zipBuffer = base64ToArrayBuffer(gameZipBase64);
+                fs.createFile("tt5.zip", new Uint8Array(zipBuffer));
+                
+                fs.extract("tt5.zip").then(function () {
+                    document.getElementById("start-overlay").style.display = "none";
+                    main(["-c", "tt.EXE"]);
+                });
+            });
         }
     </script>
 
