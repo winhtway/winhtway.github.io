@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Retro Typing Tutor 5 Online</title>
+    <title>Classic Typing Tutor 5 Online</title>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -19,7 +19,9 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid #3f3f5f;
             position: relative; width: 820px; height: 620px;
         }
-        #jsdos-canvas { width: 100%; height: 100%; border-radius: 4px; display: block; background: #000; }
+        #emulator-iframe {
+            width: 100%; height: 100%; border: none; border-radius: 4px; display: block; background: #000;
+        }
         #start-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.95); display: flex; flex-direction: column;
@@ -31,7 +33,6 @@
             box-shadow: 0 0 20px rgba(0, 236, 255, 0.5); cursor: pointer; transition: all 0.2s; margin-bottom: 15px;
         }
         #start-button:hover { transform: scale(1.05); background-color: #ffffff; }
-        .loading-text { color: #a0a0c0; font-size: 14px; display: none; text-align: center; }
         .instructions { margin-top: 15px; font-size: 13px; color: #8888a0; max-width: 800px; text-align: center; line-height: 1.5; }
         .instructions span { color: #ffaa00; font-weight: bold; }
     </style>
@@ -44,42 +45,39 @@
     </div>
 
     <div class="emulator-container">
+        <!-- Start Overlay -->
         <div id="start-overlay">
-            <button id="start-button" onclick="startEmulator()">Typing Tutor 5 ကိုစတင်ရန် နှိပ်ပါ</button>
-            <div id="loading-status" class="loading-text">
-                ဂိမ်းစနစ်ကို ချိတ်ဆက်မောင်းနှင်နေပါသည်...<br>
-                <span style="font-size: 12px; color: #00ecff;">(ပထမဆုံးအကြိမ်တွင် စက္ကန့်အနည်းငယ် ကြာနိုင်ပါသည်)</span>
-            </div>
+            <button id="start-button" onclick="launchGame()">Typing Tutor 5 ကိုစတင်ရန် နှိပ်ပါ</button>
         </div>
-        <canvas id="jsdos-canvas"></canvas>
+        <!-- Emulator Window -->
+        <div id="emulator-target" style="width:100%; height:100%;"></div>
     </div>
 
     <div class="instructions">
         💡 <span>အသုံးပြုပုံ လမ်းညွှန်:</span> ဂိမ်းမျက်နှာပြင် ပွင့်လာပါက <strong>Mouse ဖြင့် Screen ပေါ်သို့ တစ်ချက်နှိပ် (Click)</strong> ပေးပြီးမှ ကီးဘုတ်ကို အသုံးပြုနိုင်မည် ဖြစ်ပါသည်။
     </div>
 
-    <!-- CDN ပိတ်ဆို့မှုများကို ကျော်လွှားရန် iframe စနစ်ဖြင့် လုံးဝစိတ်ချရသော တရားဝင် Emulator အင်ဂျင်ကို တိုက်ရိုက်ဆွဲယူခြင်း -->
     <script>
-        function startEmulator() {
-            document.getElementById("start-button").style.display = "none";
-            document.getElementById("loading-status").style.display = "block";
+        function launchGame() {
+            // Overlay ကို ဖျောက်လိုက်မည်
+            document.getElementById("start-overlay").style.display = "none";
+            
+            // လက်ရှိ site ၏ absolute url လမ်းကြောင်းကို ယူပြီး ဇစ်ဖိုင်တည်နေရာကို တွက်ချက်ခြင်း
+            const currentUrl = window.location.href.split('?')[0].split('#')[0];
+            const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/') + 1);
+            const zipUrl = baseUrl + "tt5.zip";
 
-            // Browser ကန့်သတ်ချက်များအားလုံးကို ကျော်လွှားနိုင်ရန် iframe ပုံစံဖြင့် ပြောင်းလဲတည်ဆောက်ခြင်း
-            const container = document.querySelector('.emulator-container');
-            container.innerHTML = ''; // အဟောင်းတွေကို ဖျက်ထုတ်ပစ်မယ်
-
-            const iframe = document.createElement('iframe');
+            // GitHub & Browser restrictions အားလုံးကို ကျော်လွှားရန် တရားဝင် အပိတ်အဆို့မရှိသော 
+            // Emulation Engine ကို Dynamic Iframe စနစ်ဖြင့် ဆွဲခေါ်အသုံးပြုခြင်း
+            const target = document.getElementById("emulator-target");
+            const iframe = document.createElement("iframe");
             
-            // ကမ္ဘာ့အသုံးအများဆုံး လုံုံခြုံစိတ်ချရသည့် DOSZone Emulator Embed Link ကို အသုံးပြုထားပါသည်
-            // ၎င်းသည် tt5.zip ကို အလိုအလျောက်ဆွဲပြီး စက်တိုင်းတွင် အလုပ်လုပ်စေပါသည်
-            iframe.src = "https://dos.zone/player/?bundleUrl=" + encodeURIComponent(window.location.href.replace('index.html', '') + 'tt5.zip') + "&c=TT.EXE";
+            iframe.id = "emulator-iframe";
+            // Emulate to DOS Zone Player (ဘယ်လုံခြုံရေးစနစ်မဆို ကျော်လွှားနိုင်ပါသည်)
+            iframe.src = "https://dos.zone/player/?bundleUrl=" + encodeURIComponent(zipUrl) + "&c=TT.EXE";
+            iframe.setAttribute("allowfullscreen", "true");
             
-            iframe.style.width = "100%";
-            iframe.style.height = "100%";
-            iframe.style.border = "none";
-            iframe.setAttribute('allowfullscreen', 'true');
-            
-            container.appendChild(iframe);
+            target.appendChild(iframe);
         }
     </script>
 
