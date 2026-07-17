@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Retro Typing Tutor 5 Online</title>
     
-    <!-- JS-DOS v7 ၏ တရားဝင် CDN အမှန်များ -->
-    <script src="https://v7.js-dos.com/javascript/js-dos.js"></script>
-    <link href="https://v7.js-dos.com/javascript/js-dos.css" rel="stylesheet">
+    <!-- ကမ္ဘာ့အကြီးဆုံးနှင့် အတည်ငြိမ်ဆုံး CDNJS မှ JS-DOS Library ကို ပြောင်းခေါ်ထားပါသည် -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-dos/6.2.2/js-dos.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/js-dos/6.2.2/js-dos.css" rel="stylesheet">
     
     <style>
         * {
@@ -50,11 +50,14 @@
             width: 820px;
             height: 620px;
         }
-        #jsdos {
+        /* JS-DOS Container (Canvas စနစ်ဖြင့် ပြန်ပြောင်းထားပါသည်) */
+        #jsdos-canvas {
             width: 100%;
             height: 100%;
+            border-radius: 4px;
+            display: block;
         }
-        /* Overlay UI */
+        /* Start Button Overlay */
         #start-overlay {
             position: absolute;
             top: 0;
@@ -118,13 +121,13 @@
         <div id="start-overlay">
             <button id="start-button" onclick="startEmulator()">Typing Tutor 5 ကိုစတင်ရန် နှိပ်ပါ</button>
             <div id="loading-status" class="loading-text">
-                ဂိမ်းဖိုင်များကို စတင်ရယူနေပါသည်...<br>
-                <span style="font-size: 12px; color: #ff5555;">(မည်းနေပါက ခေတ္တစောင့်ဆိုင်းပေးပါ၊ ပထမအကြိမ်တွင် စက္ကန့် ၃၀ ခန့် ကြာနိုင်ပါသည်)</span>
+                ဂိမ်းစနစ်နှင့် ဖိုင်များကို ပြင်ဆင်နေပါသည်...<br>
+                <span style="font-size: 12px; color: #00ecff;">(ပထမဆုံးအကြိမ်တွင် စက္ကန့်အနည်းငယ် ကြာနိုင်ပါသည်)</span>
             </div>
         </div>
         
-        <!-- JS-DOS Div -->
-        <div id="jsdos"></div>
+        <!-- Canvas Element -->
+        <canvas id="jsdos-canvas"></canvas>
     </div>
 
     <div class="instructions">
@@ -132,35 +135,36 @@
     </div>
 
     <script>
-        // ကမ္ဘာလုံးဆိုင်ရာ JS-DOS Setup ကို ကြိုတင်သတ်မှတ်ခြင်း
-        // ၎င်းသည် ကွန်ပျူတာအချို့တွင် ဖြစ်တတ်သော .wasm resource error ကို ကျော်လွှားပေးနိုင်သည်
-        Dos.configure({
-            noWebGl: false, // WebGL အသုံးပြုရန်
-            worker: false   // ပိုမိုတည်ငြိမ်စေရန် main thread ပေါ်တွင်ပဲ မောင်းရန်
-        });
-
         function startEmulator() {
+            // UI ပြောင်းလဲခြင်း
             document.getElementById("start-button").style.display = "none";
             document.getElementById("loading-status").style.display = "block";
 
-            // တိုက်ရိုက် ရိုးရှင်းစွာ မောင်းနှင်သည့် ပုံစံအသစ်
-            Dos(document.getElementById("jsdos"))
-                .run("tt5.zip") // ဇစ်ဖိုင်ကို အရင်ဆွဲတင်မည်
-                .then((ci) => {
-                    console.log("ZIP loaded successfully!");
+            // ပိုမိုသေချာသော Cloudflare CDN ရှိ wdosbox အင်ဂျင်ကို ညွှန်းဆိုခြင်း
+            Dos(document.getElementById("jsdos-canvas"), {
+                wdosboxUrl: "https://cdnjs.cloudflare.com/ajax/libs/js-dos/6.2.2/wdosbox.js"
+            }).ready(function (fs, main) {
+                
+                // tt5.zip ကို ဆွဲယူပြီး ဖြည်ခြင်း
+                fs.extract("tt5.zip").then(function () {
                     
-                    // ဇစ်ဖိုင်ပွင့်ပြီးလျှင် ၎င်းထဲမှ TT.EXE ကို လှမ်းမောင်းခြင်း
-                    ci.shell("TT.EXE");
-                    
-                    // အားလုံးအဆင်ပြေက ကန့်လန့်ကာ မျက်နှာပြင်ကို ဖျောက်မည်
+                    // အောင်မြင်ပါက ကန့်လန့်ကာ Overlay ကို ဖျောက်ခြင်း
                     document.getElementById("start-overlay").style.display = "none";
-                })
-                .catch((err) => {
-                    console.error("JS-DOS Error:", err);
-                    alert("အမှားအယွင်း ရှိနေပါသည်။ သင့် Browser ၏ Console (F12) တွင် ကြည့်ရှုစစ်ဆေးပါ။");
+                    
+                    // TT.EXE ကို မောင်းနှင်ခြင်း
+                    main(["-c", "TT.EXE"]).then(function (ci) {
+                        console.log("Typing Tutor 5 Successfully Started!");
+                        document.getElementById("jsdos-canvas").focus();
+                    });
+                    
+                }).catch(function (err) {
+                    console.error("Zip extract error: ", err);
+                    alert("tt5.zip ဖိုင်ကို မတွေ့ပါ သို့မဟုတ် ဖိုင်တည်ဆောက်ပုံ မှားယွင်းနေပါသည်။ GitHub ပေါ်တွင် ၎င်းဖိုင် ရှိမရှိ ပြန်စစ်ပေးပါ။");
                     document.getElementById("start-button").style.display = "block";
                     document.getElementById("loading-status").style.display = "none";
                 });
+                
+            });
         }
     </script>
 
