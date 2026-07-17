@@ -23,6 +23,7 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
+            overflow-x: hidden;
         }
         .header {
             text-align: center;
@@ -39,34 +40,36 @@
             color: #a0a0c0;
             font-size: 14px;
         }
-        .emulator-wrapper {
+        .emulator-container {
             background-color: #0f0f1a;
             padding: 10px;
             border-radius: 8px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             border: 2px solid #3f3f5f;
-            position: relative; /* Button Overlay အတွက် လိုအပ်သည် */
+            position: relative;
+            width: 820px;
+            height: 620px;
         }
         /* JS-DOS V6 Canvas Container */
         #jsdos-canvas {
-            width: 800px;
-            height: 600px;
+            width: 100%;
+            height: 100%;
             border-radius: 4px;
             display: block;
         }
         /* Start Button Overlay */
         #start-overlay {
             position: absolute;
-            top: 10px;
-            left: 10px;
-            right: 10px;
-            bottom: 10px;
-            background-color: rgba(0, 0, 0, 0.85);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            border-radius: 4px;
-            cursor: pointer;
+            border-radius: 6px;
             z-index: 10;
         }
         #start-button {
@@ -78,11 +81,18 @@
             font-weight: bold;
             border-radius: 30px;
             box-shadow: 0 0 20px rgba(0, 236, 255, 0.5);
+            cursor: pointer;
             transition: all 0.2s;
+            margin-bottom: 15px;
         }
         #start-button:hover {
             transform: scale(1.05);
             background-color: #ffffff;
+        }
+        .loading-text {
+            color: #a0a0c0;
+            font-size: 14px;
+            display: none;
         }
         .instructions {
             margin-top: 15px;
@@ -105,43 +115,51 @@
         <p>ဂန္ထဝင် လက်ကွက်အခြေခံ စာရိုက်လေ့ကျင့်ခန်းစနစ်</p>
     </div>
 
-    <!-- Emulator wrapper -->
-    <div class="emulator-wrapper">
-        <!-- Start Button Overlay: ပထမဆုံးပေါ်နေမည့်အရာ -->
-        <div id="start-overlay" onclick="startEmulator()">
-            <button id="start-button">Typing Tutor 5 ကိုစတင်ရန် နှိပ်ပါ</button>
+    <!-- Emulator Container -->
+    <div class="emulator-container">
+        <!-- Start Button Overlay -->
+        <div id="start-overlay">
+            <button id="start-button" onclick="startEmulator()">Typing Tutor 5 ကိုစတင်ရန် နှိပ်ပါ</button>
+            <div id="loading-status" class="loading-text">ဂိမ်းဖိုင်များကို ရယူနေပါသည်... ခေတ္တစောင့်ဆိုင်းပေးပါ...</div>
         </div>
         <!-- Emulator Canvas -->
         <canvas id="jsdos-canvas"></canvas>
     </div>
 
     <div class="instructions">
-        💡 <span>အသုံးပြုပုံ လမ်းညွှန်:</span> 'စတင်ရန် နှိပ်ပါ' ခလုတ်ကို နှိပ်ပြီးနောက် Game Screen ပေါ်လာပါက <strong>Mouse ဖြင့် တစ်ချက်နှိပ် (Click)</strong> ပေးပြီးမှ Keyboard ကီးဘုတ်ကို အသုံးပြုနိုင်မည် ဖြစ်ပါသည်။ (Desktop/Laptop သီးသန့်ဖြစ်သည်)
+        💡 <span>အသုံးပြုပုံ လမ်းညွှန်:</span> 'စတင်ရန် နှိပ်ပါ' ခလုတ်ကို နှိပ်ပြီးနောက် Game Screen ပေါ်လာပါက <strong>Emulator Screen ပေါ်တွင် Mouse ဖြင့် တစ်ချက်နှိပ် (Click)</strong> ပေးပြီးမှ Keyboard ကို အသုံးပြုနိုင်မည် ဖြစ်ပါသည်။ (Desktop/Laptop သီးသန့်ဖြစ်သည်)
     </div>
 
     <!-- JS-DOS V6 Core Scripts -->
     <script src="https://js-dos.com/v6/build/js-dos.js"></script>
     <script>
-        // Start Function: ခလုတ်နှိပ်မှ အလုပ်လုပ်မည်
         function startEmulator() {
-            // Overlay ကို ဖျောက်လိုက်ခြင်း
-            document.getElementById("start-overlay").style.display = "none";
+            // ခလုတ်ကို ဝှက်ပြီး Loading စာသားပြရန်
+            document.getElementById("start-button").style.display = "none";
+            document.getElementById("loading-status").style.display = "block";
 
-            // JS-DOS V6 initialization
+            // JS-DOS V6 Setup
             Dos(document.getElementById("jsdos-canvas"), {
                 wdosboxUrl: "https://js-dos.com/v6/build/wdosbox.js"
             }).ready(function (fs, main) {
-                // tt5.zip ဖိုင်ကို ဆွဲယူဖွင့်လှစ်ခြင်း
-                // Zip နာမည်က tt5.zip ဖြစ်နေဖို့ သေချာပါစေ (Case Sensitive)
+                // Zip ဖိုင်ဆွဲယူခြင်း
                 fs.extract("tt5.zip").then(function () {
-                    // zip ထဲမှာရှိတဲ့ program စမယ့် exe ဖိုင်ကို ညွှန်းပေးခြင်း
-                    // executable နာမည်က TT.EXE အမှန်ပဲဖြစ်ရပါမယ်
+                    // Overlay တစ်ခုလုံးကို ဖျောက်လိုက်ခြင်း
+                    document.getElementById("start-overlay").style.display = "none";
+                    
+                    // EXE မောင်းနှင်ခြင်း
                     main(["-c", "TT.EXE"]).then(function (ci) {
-                        console.log("Typing Tutor 5 Started!");
+                        console.log("Typing Tutor 5 Started successfully.");
+                        
+                        // အလိုအလျောက် Focus ရရှိစေရန် ရည်ရွယ်ချက်ရှိရှိ Canvas ကို Focus ပေးခြင်း
+                        document.getElementById("jsdos-canvas").focus();
                     });
                 }).catch(function (err) {
-                    console.error("Zip extract error: ", err);
-                    alert("Typing Tutor ဖိုင်များကို Load လုပ်ရာတွင် အမှားအယွင်းရှိပါသည်။ (tt5.zip ဖိုင်မရှိခြင်း သို့မဟုတ် ဖိုင်တည်ဆောက်ပုံ မှားယွင်းခြင်း)");
+                    console.error("Error extracting zip: ", err);
+                    alert("Typing Tutor ဖိုင်များကို Load လုပ်ရာတွင် အမှားအယွင်းရှိပါသည်။ ရည်ညွှန်းထားသော 'tt5.zip' ဖိုင်ရှိမရှိ သို့မဟုတ် စာလုံးအကြီးအသေး မှန်ကန်မှုရှိမရှိ ပြန်လည်စစ်ဆေးပေးပါ။");
+                    // အမှားဖြစ်ခဲ့လျှင် ခလုတ်ပြန်ပြရန်
+                    document.getElementById("start-button").style.display = "block";
+                    document.getElementById("loading-status").style.display = "none";
                 });
             });
         }
