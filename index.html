@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classic Typing Tutor 5 - Custom Key Practice</title>
+    <title>Starting Typing- Smart Shift Mode</title>
     <style>
         * { box-sizing: border-box; }
         body {
             margin: 0; padding: 0; background-color: #1a1a2e; color: #ffffff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh;
+            user-select: none;
         }
         .header { text-align: center; margin-bottom: 20px; }
         .header h1 { margin: 0; font-size: 26px; color: #00ecff; text-shadow: 0 0 10px rgba(0, 236, 255, 0.5); }
@@ -21,34 +22,25 @@
             width: 900px; text-align: center;
         }
 
-        /* Mode Selector */
-        .key-selector {
-            background-color: #161625; padding: 15px; border-radius: 8px;
+        /* Active Mode Header */
+        .mode-indicator {
+            background-color: #161625; padding: 12px; border-radius: 8px;
             margin-bottom: 20px; border: 1px solid #2a2a40;
-            display: flex; justify-content: center; align-items: center; gap: 15px;
+            font-size: 18px; font-weight: bold; color: #ffaa00;
         }
-        .key-selector label { font-size: 16px; color: #00ecff; font-weight: bold; }
-        .key-selector input {
-            background-color: #252538; border: 1px solid #444460; color: #ffffff;
-            padding: 8px 15px; font-size: 18px; border-radius: 6px; width: 80px;
-            text-align: center; font-weight: bold; text-transform: uppercase;
-        }
-        .key-selector button {
-            background-color: #00ecff; color: #1a1a2e; border: none; padding: 8px 20px;
-            font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: all 0.2s;
-        }
-        .key-selector button:hover { background-color: #ffffff; transform: scale(1.05); }
+        .mode-indicator span { color: #00ecff; font-size: 22px; background: #252538; padding: 2px 12px; border-radius: 4px; border: 1px solid #444460; }
 
         /* စာရိုက်ရန်ပြသသည့်နေရာ */
         .text-display {
             background-color: #161625; padding: 20px; border-radius: 8px;
-            font-size: 28px; font-family: 'Courier New', Courier, monospace;
-            letter-spacing: 4px; margin-bottom: 20px; border: 1px solid #2a2a40;
+            font-size: 30px; font-family: 'Courier New', Courier, monospace;
+            letter-spacing: 2px; margin-bottom: 20px; border: 1px solid #2a2a40;
             min-height: 80px; display: flex; justify-content: center; align-items: center;
             word-break: break-all;
         }
+        .placeholder-text { color: #5f5f7f; font-size: 20px; font-family: 'Segoe UI', sans-serif; letter-spacing: 0px; }
         .correct { color: #00ff88; text-shadow: 0 0 5px rgba(0,255,136,0.5); }
-        .current { background-color: #00ecff; color: #1a1a2e; border-radius: 4px; padding: 0 4px; }
+        .current { background-color: #00ecff; color: #1a1a2e; border-radius: 4px; padding: 0 2px; }
         
         /* ကီးဘုတ်ပုံစံ */
         .keyboard { display: flex; flex-direction: column; gap: 6px; align-items: center; margin-bottom: 20px; background: #131324; padding: 15px; border-radius: 8px; }
@@ -68,8 +60,9 @@
 
         .finger-guide {
             background-color: #1a1e36; padding: 12px; border-radius: 6px;
-            font-size: 16px; color: #ffaa00; font-weight: bold; border-left: 4px solid #ffaa00;
+            font-size: 16px; color: #ffffff; font-weight: bold; border-left: 4px solid #00ecff;
             margin-bottom: 15px; text-align: left; padding-left: 20px;
+            min-height: 48px; display: flex; align-items: center;
         }
 
         .stats { display: flex; justify-content: space-around; font-size: 16px; color: #a0a0c0; }
@@ -79,23 +72,23 @@
 <body>
 
     <div class="header">
-        <h1>⌨️ Classic Typing Tutor 5 (Custom Mode)</h1>
-        <p>မိမိ လေ့ကျင့်လိုသော ကီးကိုရွေးချယ်ပြီး သီးသန့်ကျင့်ရန်စနစ်</p>
+        <h1>⌨️ Basic Typing</h1>
+        <p>အသေးနှိပ်လျှင် အသေးသီးသန့်၊ အကြီးနှိပ်လျှင် အကြီးအသေးရောနှောကျင့်နိုင်သောစနစ်</p>
     </div>
 
     <div class="container">
-        <!-- ကီးရွေးချယ်သည့်နေရာ -->
-        <div class="key-selector">
-            <label for="custom-key">ကျင့်လိုသောကီးကို ရိုက်ထည့်ပါ:</label>
-            <input type="text" id="custom-key" maxlength="1" value="s" onfocus="this.select()">
-            <button onclick="generateCustomLesson()">လေ့ကျင့်ခန်းထုတ်ရန်</button>
+        <!-- လက်ရှိကျင့်နေသော ကီးပြကွက် -->
+        <div class="mode-indicator">
+            လက်ရှိလေ့ကျင့်နေသောကီး: <span id="active-key-view">-</span>
         </div>
 
         <!-- လက်ချောင်းလမ်းညွှန် -->
-        <div class="finger-guide" id="guide-text">စတင်ရန် အပေါ်ကခလုတ်ကို နှိပ်ပါ သို့မဟုတ် ကီးဘုတ်မှ စတင်ရိုက်ပါ။</div>
+        <div class="finger-guide" id="guide-text">လေ့ကျင့်လိုသော ကီးဘုတ်ကီးတစ်ခုခုကို စတင်နှိပ်လိုက်ပါ...</div>
 
         <!-- စာသားပြကွက် -->
-        <div class="text-display" id="text-display"></div>
+        <div class="text-display" id="text-display">
+            <span class="placeholder-text">[လေ့ကျင့်လိုသော ကီးတစ်ခုခုကို ကီးဘုတ်မှ စတင်နှိပ်ပါ...]</span>
+        </div>
 
         <!-- On-Screen Full Keyboard -->
         <div class="keyboard">
@@ -105,7 +98,7 @@
             </div>
             <!-- Row 2 -->
             <div class="row">
-                <div class="key wide">Tab</div><div class="key" id="key-Q">Q</div><div class="key" id="key-W">W</div><div class="key" id="key-E">E</div><div class="key" id="key-Y">Y</div><div class="key" id="key-U">U</div><div class="key" id="key-I">I</div><div class="key" id="key-O">O</div><div class="key" id="key-P">P</div><div class="key" id="key-[">{ [</div><div class="key" id="key-]">} ]</div><div class="key" id="key-\">| \</div>
+                <div class="key wide">Tab</div><div class="key" id="key-Q">Q</div><div class="key" id="key-W">W</div><div class="key" id="key-E">E</div><div class="key" id="key-R">R</div><div class="key" id="key-T">T</div><div class="key" id="key-Y">Y</div><div class="key" id="key-U">U</div><div class="key" id="key-I">I</div><div class="key" id="key-O">O</div><div class="key" id="key-P">P</div><div class="key" id="key-[">{ [</div><div class="key" id="key-]">} ]</div><div class="key" id="key-\">| \</div>
             </div>
             <!-- Row 3 -->
             <div class="row">
@@ -113,7 +106,7 @@
             </div>
             <!-- Row 4 -->
             <div class="row">
-                <div class="key wide">Shift</div><div class="key" id="key-Z">Z</div><div class="key" id="key-X">X</div><div class="key" id="key-C">C</div><div class="key" id="key-V">V</div><div class="key" id="key-B">B</div><div class="key" id="key-N">N</div><div class="key" id="key-M">M</div><div class="key" id="key-,">&lt; ,</div><div class="key" id="key-.">&gt; .</div><div class="key" id="key-/">? /</div><div class="key wide">Shift</div>
+                <div class="key wide" id="key-LShift">Shift</div><div class="key" id="key-Z">Z</div><div class="key" id="key-X">X</div><div class="key" id="key-C">C</div><div class="key" id="key-V">V</div><div class="key" id="key-B">B</div><div class="key" id="key-N">N</div><div class="key" id="key-M">M</div><div class="key" id="key-,">&lt; ,</div><div class="key" id="key-.">&gt; .</div><div class="key" id="key-/">? /</div><div class="key wide" id="key-RShift">Shift</div>
             </div>
             <!-- Row 5 -->
             <div class="row">
@@ -136,19 +129,21 @@
         let currentIndex = 0;
         let errorCount = 0;
         let correctCount = 0;
+        let isLessonFinished = true; 
 
-        // အခြေခံ ကီးများနှင့် ၎င်းတို့၏ ဘယ်ဘက်အရန်တွဲဖက်ကီး (Home Key Anchor) သတ်မှတ်ချက်
+        // Home Key Anchors Mapping
         const anchorMapping = {
             'q': 'a', 'w': 's', 'e': 'd', 'r': 'f', 't': 'f', 'y': 'j', 'u': 'j', 'i': 'k', 'o': 'l', 'p': ';',
             'a': 'a', 's': 'a', 'd': 's', 'f': 'd', 'g': 'f', 'h': 'j', 'j': 'j', 'k': 'j', 'l': 'k', ';': 'l', "'": ';',
             'z': 'a', 'x': 's', 'c': 'd', 'v': 'f', 'b': 'f', 'n': 'j', 'm': 'j', ',': 'k', '.': 'l', '/': ';',
             '1': 'a', '2': 's', '3': 'd', '4': 'f', '5': 'f', '6': 'j', '7': 'j', '8': 'k', '9': 'l', '0': ';',
-            '-': ';', '=': ';', '`': 'a', '[': ';', ']': ';', '\\': ';'
+            '-': ';', '=': ';', '`': 'a', '[': ';', ']': ';', '\\': ';',
+            '!': 'a', '@': 's', '#': 'd', '$': 'f', '%': 'f', '^': 'j', '&': 'j', '*': 'k', '(': 'l', ')': ';',
+            '_': ';', '+': ';', '~': 'a', '{': ';', '}': ';', '|': ';', ':': 'l', '"': ';', '<': 'k', '>': 'l', '?': ';'
         };
 
-        // လက်ချောင်း လမ်းညွှန်မှုများ (ကီးဘုတ်အပြည့်အတွက်)
         const fingerGuide = {
-            'q': 'ဘယ်ဘက်သန်းဗူးတုံးကို အပေါ်တင်ပြီး "Q" ကိုရိုက်ပါ။',
+            'q': 'ဘယ်ဘက်လက်သန်းကို အပေါ်တင်ပြီး "Q" ကိုရိုက်ပါ။',
             'w': 'ဘယ်ဘက်လက်သူကြွယ်ကို အပေါ်တင်ပြီး "W" ကိုရိုက်ပါ။',
             'e': 'ဘယ်ဘက်လက်ခလယ်ကို အပေါ်တင်ပြီး "E" ကိုရိုက်ပါ။',
             'r': 'ဘယ်ဘက်လက်ညှိုးကို အပေါ်တင်ပြီး "R" ကိုရိုက်ပါ။',
@@ -157,8 +152,8 @@
             'u': 'ညာဘက်လက်ညှိုးကို အပေါ်တင်ပြီး "U" ကိုရိုက်ပါ။',
             'i': 'ညာဘက်လက်ခလယ်ကို အပေါ်တင်ပြီး "I" ကိုရိုက်ပါ။',
             'o': 'ညာဘက်လက်သူကြွယ်ကို အပေါ်တင်ပြီး "O" ကိုရိုက်ပါ။',
-            'p': 'ညာဘက်သန်းဗူးတုံးကို အပေါ်တင်ပြီး "P" ကိုရိုက်ပါ။',
-            'a': 'ဘယ်ဘက်သန်းဗူးတုံး မူလနေရာအတိုင်း "A" ကိုရိုက်ပါ။',
+            'p': 'ညာဘက်လက်သန်းကို အပေါ်တင်ပြီး "P" ကိုရိုက်ပါ။',
+            'a': 'ဘယ်ဘက်လက်သန်းကိုမူလနေရာအတိုင်း "A" ကိုရိုက်ပါ။',
             's': 'ဘယ်ဘက်လက်သူကြွယ် မူလနေရာအတိုင်း "S" ကိုရိုက်ပါ။',
             'd': 'ဘယ်ဘက်လက်ခလယ် မူလနေရာအတိုင်း "D" ကိုရိုက်ပါ။',
             'f': 'ဘယ်ဘက်လက်ညှိုး မူလနေရာအတိုင်း "F" ကိုရိုက်ပါ။',
@@ -167,8 +162,8 @@
             'j': 'ညာဘက်လက်ညှိုး မူလနေရာအတိုင်း "J" ကိုရိုက်ပါ။',
             'k': 'ညာဘက်လက်ခလယ် မူလနေရာအတိုင်း "K" ကိုရိုက်ပါ။',
             'l': 'ညာဘက်လက်သူကြွယ် မူလနေရာအတိုင်း "L" ကိုရိုက်ပါ။',
-            ';': 'ညာဘက်သန်းဗူးတုံး မူလနေရာအတိုင်း ";" ကိုရိုက်ပါ။',
-            'z': 'ဘယ်ဘက်သန်းဗူးတုံးကို အောက်ချပြီး "Z" ကိုရိုက်ပါ။',
+            ';': 'ညာဘက်လက်သန်း မူလနေရာအတိုင်း ";" ကိုရိုက်ပါ။',
+            'z': 'ဘယ်ဘက်လက်သန်းကို အောက်ချပြီး "Z" ကိုရိုက်ပါ။',
             'x': 'ဘယ်ဘက်လက်သူကြွယ်ကို အောက်ချပြီး "X" ကိုရိုက်ပါ။',
             'c': 'ဘယ်ဘက်လက်ခလယ်ကို အောက်ချပြီး "C" ကိုရိုက်ပါ။',
             'v': 'ဘယ်ဘက်လက်ညှိုးကို အောက်ချပြီး "V" ကိုရိုက်ပါ။',
@@ -177,40 +172,60 @@
             'm': 'ညာဘက်လက်ညှိုးကို အောက်ချပြီး "M" ကိုရိုက်ပါ။',
             ',': 'ညာဘက်လက်ခလယ်ကို အောက်ချပြီး "," ကိုရိုက်ပါ။',
             '.': 'ညာဘက်လက်သူကြွယ်ကို အောက်ချပြီး "." ကိုရိုက်ပါ။',
-            '/': 'ညာဘက်သန်းဗူးတုံးကို အောက်ချပြီး "/" ကိုရိုက်ပါ။',
-            ' ': 'ဘယ်ဘက် သို့မဟုတ် ညာဘက် လက်မဖြင့် "Spacebar" ကို နှိပ်ပါ။'
+            '/': 'ညာဘက်လက်သန်းကို အောက်ချပြီး "/" ကိုရိုက်ပါ။',
+            ' ': 'လက်မဖြင့် "Spacebar" ကို နှိပ်ပါ။'
         };
 
-        function generateCustomLesson() {
-            const inputKey = document.getElementById('custom-key').value.toLowerCase();
-            if (!inputKey) return;
+        const leftSideKeys = ['q','w','e','r','t','a','s','d','f','g','z','x','c','v','b','1','2','3','4','5','!','@','#','$','%','~'];
 
-            // Anchor key ကိုရှာသည် (မရှိလျှင် 'a' ကို default သုံးသည်)
-            const anchorKey = anchorMapping[inputKey] || 'a';
+        function generateLessonFromKey(inputKey) {
+            let checkKey = inputKey.toLowerCase();
+            if (!anchorMapping.hasOwnProperty(checkKey)) return false;
+
+            document.getElementById('active-key-view').innerText = inputKey;
             
-            // သင်အလိုရှိသည့်အတိုင်း ရွေးချယ်လိုက်သောကီးနှင့် ၎င်း၏အဖော်ကီး နှစ်လုံးတည်းဖြင့် လေ့ကျင့်ခန်းထုတ်ခြင်း
+            let anchorKey = anchorMapping[checkKey];
             let generated = [];
-            const patterns = [
-                `${anchorKey}${inputKey} `, `${inputKey}${anchorKey} `, 
-                `${inputKey}${inputKey}${anchorKey} `, `${anchorKey}${anchorKey}${inputKey} `,
-                `${inputKey}${anchorKey}${inputKey}${anchorKey} `
-            ];
 
-            // စာသားတွဲကို ကျပန်း (Random) ၅ ခါလောက် ပတ်မွှေပြီး လေ့ကျင့်ခန်း ရှည်ရှည်ထုတ်ပေးခြင်း
-            for (let i = 0; i < 6; i++) {
-                generated.push(patterns[Math.floor(Math.random() * patterns.length)]);
+            // အကယ်၍ ရိုက်လိုက်သောကီးသည် စာလုံးအသေး ဖြစ်ပါက (ဥပမာ 's')
+            if (inputKey === checkKey && /[a-z]/.test(inputKey)) {
+                // အသေးသီးသန့် Patterns (အကြီး လုံးဝမပါပါ)
+                const patterns = [
+                    `${anchorKey}${checkKey}`, `${checkKey}${anchorKey}`, 
+                    `${checkKey}${checkKey}${anchorKey}`, `${anchorKey}${anchorKey}${checkKey}`
+                ];
+                for (let i = 0; i < 5; i++) {
+                    generated.push(patterns[Math.floor(Math.random() * patterns.length)]);
+                }
+            } 
+            // အကယ်၍ ရိုက်လိုက်သောကီးသည် Shift သုံးရသော စာလုံးအကြီး သို့မဟုတ် သင်္ကေတဖြစ်ပါက
+            else {
+                let upperKey = inputKey; 
+                let lowerKey = checkKey; 
+
+                // အက္ခရာများအတွက် အသေးနှင့်အကြီး ရောနှောမုဒ်
+                const patterns = [
+                    `${lowerKey}${upperKey}`, `${upperKey}${lowerKey}`, 
+                    `${lowerKey}${upperKey}${lowerKey}`, `${upperKey}${lowerKey}${upperKey}`,
+                    `${anchorKey}${upperKey}${lowerKey}`
+                ];
+                for (let i = 0; i < 5; i++) {
+                    generated.push(patterns[Math.floor(Math.random() * patterns.length)]);
+                }
             }
 
-            lessonText = generated.join('').trim();
+            lessonText = generated.join(' ').trim();
             currentIndex = 0;
             errorCount = 0;
             correctCount = 0;
+            isLessonFinished = false;
             
             document.getElementById('score').innerText = '0';
             document.getElementById('errors').innerText = '0';
             document.getElementById('accuracy').innerText = '100%';
 
             updateDisplay();
+            return true;
         }
 
         function updateDisplay() {
@@ -228,22 +243,42 @@
 
             const currentLetter = lessonText[currentIndex];
             if (currentLetter) {
-                document.getElementById('guide-text').innerText = fingerGuide[currentLetter] || `"${currentLetter.toUpperCase()}" ကီးကို ရိုက်ပါ။`;
-                highlightKey(currentLetter);
+                let guideText = fingerGuide[currentLetter.toLowerCase()] || `"${currentLetter}" ကိုရိုက်ပါ။`;
+                
+                if (currentLetter === currentLetter.toUpperCase() && currentLetter !== currentLetter.toLowerCase() && currentLetter !== ' ') {
+                    if (leftSideKeys.includes(currentLetter.toLowerCase())) {
+                        guideText = `[ညာဘက် Shift ဖိထားပေးပါ] ` + guideText;
+                        highlightKey(currentLetter, 'RShift');
+                    } else {
+                        guideText = `[ဘယ်ဘက် Shift ဖိထားပေးပါ] ` + guideText;
+                        highlightKey(currentLetter, 'LShift');
+                    }
+                } else {
+                    highlightKey(currentLetter);
+                }
+                
+                document.getElementById('guide-text').innerText = guideText;
             } else if(lessonText.length > 0) {
-                document.getElementById('guide-text').innerText = "🎉 လေ့ကျင့်ခန်း ပြီးပါပြီ။ နောက်တစ်လုံး ထပ်မံရွေးချယ်ပြီး ကျင့်နိုင်ပါတယ်!";
+                isLessonFinished = true;
+                document.getElementById('guide-text').innerHTML = "🎉 <span style='color: #00ff88;'>လေ့ကျင့်ခန်း ပြီးဆုံးပါပြီ။</span> နောက်ထပ် ကျင့်လိုသော ကီးဘုတ်ကီးအသစ်တစ်ခုခုကို တိုက်ရိုက်နှိပ်ပြီး အသစ်ပြောင်းလဲနိုင်ပါပြီဗျာ။";
                 removeHighlights();
             }
         }
 
-        function highlightKey(letter) {
+        function highlightKey(letter, extraShiftId = null) {
             removeHighlights();
+            
             let keyId = 'key-';
             if (letter === ' ') keyId += 'Space';
             else keyId += letter.toUpperCase();
 
             const keyEl = document.getElementById(keyId);
             if (keyEl) keyEl.classList.add('highlight-key');
+
+            if (extraShiftId) {
+                const shiftEl = document.getElementById(`key-${extraShiftId}`);
+                if (shiftEl) shiftEl.classList.add('highlight-key');
+            }
         }
 
         function removeHighlights() {
@@ -251,44 +286,40 @@
         }
 
         window.addEventListener('keydown', (e) => {
-            // Input box ထဲမှာ စာရိုက်နေစဉ်အတွင်း ဂိမ်းကီးဘုတ် အလုပ်မလုပ်စေရန် တားဆီးခြင်း
-            if (document.activeElement === document.getElementById('custom-key')) {
-                if (e.key === 'Enter') {
-                    generateCustomLesson();
-                    document.getElementById('custom-key').blur();
-                }
-                return;
-            }
-
-            if (currentIndex >= lessonText.length) return;
-
             let pressedKey = e.key;
-            const targetKey = lessonText[currentIndex];
-
             if (pressedKey === 'Spacebar') pressedKey = ' ';
+            if (pressedKey === 'Shift') return;
 
-            if (pressedKey.toLowerCase() === targetKey.toLowerCase()) {
-                correctCount++;
-                currentIndex++;
-                document.getElementById('score').innerText = currentIndex;
-            } else {
-                if(pressedKey.length === 1) {
-                    errorCount++;
-                    document.getElementById('errors').innerText = errorCount;
+            if (isLessonFinished) {
+                if (pressedKey.length === 1 && pressedKey !== ' ') {
+                    const isChanged = generateLessonFromKey(pressedKey);
+                    if (isChanged) return;
                 }
             }
 
-            const total = correctCount + errorCount;
-            if (total > 0) {
-                const acc = Math.round((correctCount / total) * 100);
-                document.getElementById('accuracy').innerText = acc + '%';
+            if (currentIndex < lessonText.length) {
+                const targetKey = lessonText[currentIndex];
+
+                if (pressedKey === targetKey) {
+                    correctCount++;
+                    currentIndex++;
+                    document.getElementById('score').innerText = currentIndex;
+                } else {
+                    if(pressedKey.length === 1) {
+                        errorCount++;
+                        document.getElementById('errors').innerText = errorCount;
+                    }
+                }
+
+                const total = correctCount + errorCount;
+                if (total > 0) {
+                    const acc = Math.round((correctCount / total) * 100);
+                    document.getElementById('accuracy').innerText = acc + '%';
+                }
+
+                updateDisplay();
             }
-
-            updateDisplay();
         });
-
-        // မျက်နှာပြင်စဖွင့်လျှင် 'S' အတွက် အလိုအလျောက် ထုတ်ပေးထားခြင်း
-        generateCustomLesson();
     </script>
 </body>
 </html>
